@@ -1,0 +1,392 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* A subtle gradient from the lightest blue to a slightly darker one */
+  background: linear-gradient(to bottom, #e1f1fd, #c1d8f0);
+  color: #4663ac; /* Dark Blue for text */
+  line-height: 1.6;
+  min-height: 100vh; /* Ensure gradient covers the full page height */
+}
+
+/* --- Header --- */
+#gallery-container {
+  padding: 2rem;
+  text-align: center;
+  background-color: #e1f1fd;
+  border-bottom: 1px solid #c8d9ed; /* Light Blue Border */
+}
+
+#gallery-container > h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #4663ac; /* Dark Blue */
+}
+
+#gallery-container > p {
+  color: #5a7bcd; /* Lighter version of the dark blue */
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+hr {
+  display: none; /* Replaced by modern spacing */
+}
+
+/* --- Gallery Grid --- */
+.image-gallery {
+  padding: 0 2rem 2rem 2rem; /* Adjust padding */
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.album-grid {
+  display: grid;
+  /* Create a responsive grid with a minimum column width of 300px */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* --- Album Cards --- */
+.album-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.album-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.album-card:hover .album-cover-img {
+  transform: scale(1.1);
+}
+
+.album-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 50%);
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+}
+
+.album-title {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.hidden {
+  display: none !important;
+}
+
+#back-to-albums {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #c1d8f0; /* Mid Blue */
+  border: 1px solid #a9c5e8;
+  border-radius: 8px;
+  color: #4663ac; /* Dark Blue */
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#back-to-albums:hover {
+  background-color: #d2deeb; /* Lighter Blue on hover */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* --- Gallery Item & Hover Effects --- */
+.gallery-item {
+  position: relative; /* Needed for the overlay */
+  overflow: hidden; /* Hides parts of the image that zoom outside the container */
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the container without distortion */
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none; /* Prevents direct interaction like dragging */
+}
+
+/* The zoom effect on hover */
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+/* The overlay that appears on hover */
+.gallery-item::after {
+  content: 'View Photo';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Make the overlay visible on hover */
+.gallery-item:hover::after {
+  opacity: 1;
+}
+
+/* --- Lightbox Modal --- */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.85); /* Black w/ opacity */
+  backdrop-filter: blur(5px); /* The blur effect */
+  -webkit-backdrop-filter: blur(5px); /* For Safari */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* Stack image and caption vertically */
+}
+
+.modal-content {
+  margin: auto;
+  display: block;
+  max-width: 90%;
+  max-height: 85vh;
+  border-radius: 8px;
+  pointer-events: none; /* Prevents direct interaction like dragging */
+  /* Animation */
+  animation-name: zoomIn;
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animation for the modal pop-up */
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Style for the caption */
+#caption {
+  margin-top: 15px;
+  color: #ccc;
+  text-align: center;
+  font-size: 1.1rem;
+  width: 80%;
+  max-width: 700px;
+  line-height: 1.5;
+  /* Animation to match the image */
+  animation-name: zoomIn;
+  animation-duration: 0.4s;
+}
+
+.thumbnail-container {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 80vw;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.thumbnail-img {
+  width: 80px;
+  height: 55px;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  opacity: 0.6;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+  flex-shrink: 0; /* Prevent thumbnails from shrinking */
+}
+
+.thumbnail-img:hover {
+  opacity: 1;
+}
+
+.thumbnail-img.active {
+  opacity: 1;
+  border-color: #fff;
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+/* Navigation Arrows */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px 20px;
+  transform: translateY(-50%); /* Perfectly centers the arrow vertically */
+  color: white;
+  font-weight: bold;
+  font-size: 28px;
+  transition: 0.3s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none; /* Prevents text selection */
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.prev {
+  left: 0;
+  border-radius: 0 3px 3px 0;
+}
+
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* --- Album Photos Grid --- */
+#album-photos {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr; /* Mobile: 1 per row */
+}
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  background: #c1d8f0; /* Light background to match header */
+  color: #4663ac; /* Dark blue text */
+  font-size: 1rem;
+  font-weight: 500;
+  border-top: 1px solid #c8d9ed;
+  position: relative;
+  z-index: 10;
+}
+
+/* Heart animation */
+footer .heart {
+  color: red;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+
+/* Tablet: 3 photos per row */
+@media (min-width: 768px) {
+  #album-photos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop: 4 photos per row */
+@media (min-width: 1200px) {
+  #album-photos {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* --- Responsive Adjustments --- */
+
+/* On smaller screens, reduce padding */
+@media (max-width: 768px) {
+  .image-gallery {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  #gallery-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .modal-content {
+    max-width: 95%;
+    max-height: 75vh;
+  }
+
+  #gallery-container > h1 {
+    font-size: 2rem;
+  }
+}
+
+/* --- Scroll to Top Button --- */
+#scroll-to-top-btn {
+  display: none; /* Hidden by default */
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  z-index: 999;
+  border: none;
+  outline: none;
+  background-color: #4663ac; /* Dark Blue */
+  color: white;
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 50%;
+  font-size: 18px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: opacity 0.3s, visibility 0.3s;
+  opacity: 0;
+  visibility: hidden;
+}
+
+#scroll-to-top-btn:hover {
+  background-color: #5a7bcd; /* Lighter blue on hover */
+}
