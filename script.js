@@ -1,4 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Lazy Loading ---
+  const lazyLoad = (target) => {
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.getAttribute('data-src');
+          img.setAttribute('src', src);
+          img.classList.remove('lazy');
+          img.style.opacity = '1'; // Ensure opacity is set to 1 after loading
+          img.style.filter = 'none'; // Remove blur after loading
+          observer.disconnect();
+        }
+      });
+    });
+    observer.observe(target);
+  };
+
+  // Initially lazy load all album cover images
+  document.querySelectorAll('.album-cover-img.lazy').forEach(lazyLoad);
+
   // Create the modal elements once and append them to the body
   const modal = document.createElement('div');
   modal.id = 'image-modal';
@@ -89,40 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const albumPhotosContainer = document.getElementById('album-photos');
   const backButton = document.getElementById('back-to-albums');
   const allPhotosSource = document.querySelectorAll('.photo-source .gallery-item');
-  
-  // Group all photos by their `data-album` attribute automatically.
-  const albumContents = {};
-  allPhotosSource.forEach(photoNode => {
-    const albumName = photoNode.dataset.album;
-    if (!albumName) return; // Skip if no album is assigned
-    if (!albumContents[albumName]) {
-      albumContents[albumName] = [];
-    }
-    albumContents[albumName].push(photoNode);
-  });
 
-  // --- Lazy Loading Logic with Intersection Observer ---
-  let observer;
-
-  const lazyLoad = (target) => {
-    const io = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          const src = img.dataset.src;
-
-          img.setAttribute('src', src);
-          img.classList.remove('lazy'); // Optional: remove class after loading
-
-          // Stop observing the image once it has been loaded
-          observer.unobserve(img);
-        }
-      });
-    });
-
-    io.observe(target);
+  const albumContents = {
+    blue: Array.from(allPhotosSource).slice(0, 29),   // "White Dress" album (29 photos)
+    white: Array.from(allPhotosSource).slice(29, 43), // "Pre-wedding" album (14 photos)
+    brown: Array.from(allPhotosSource).slice(43, 91), // "Blue Dress" album (48 photos)
+    ilorin: Array.from(allPhotosSource).slice(91, 460), // "Ilorin, Kwara" album (324 photos)
+    ekoro: Array.from(allPhotosSource).slice(460, 527), // "Ekoro, Lagos" album (73 photos)
   };
-
 
   const openAlbum = (albumName) => {
     // Clear previous album photos and thumbnails
