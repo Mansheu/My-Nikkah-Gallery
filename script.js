@@ -92,8 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     blue: Array.from(allPhotosSource).slice(0, 29),   // "White Dress" album (29 photos)
     white: Array.from(allPhotosSource).slice(29, 43), // "Pre-wedding" album (14 photos)
     brown: Array.from(allPhotosSource).slice(43, 91), // "Blue Dress" album (48 photos)
-    ilorin: Array.from(allPhotosSource).slice(91, 460), // "Ilorin, Kwara" album (324 photos)
-    ekoro: Array.from(allPhotosSource).slice(460, 527), // "Ekoro, Lagos" album (73 photos)
+    ilorin: Array.from(allPhotosSource).slice(91, 458), // "Ilorin, Kwara" album (324 photos)
+    ekoro: Array.from(allPhotosSource).slice(458, 527), // "Ekoro, Lagos" album (73 photos)
   };
 
   const openAlbum = (albumName) => {
