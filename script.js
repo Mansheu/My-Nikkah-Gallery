@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     currentIndex = index;
     const item = galleryItems[currentIndex];
     modalImage.src = item.querySelector('img').src;
+    // For the main modal image, we ensure it's the high-resolution one from data-src
+    modalImage.src = item.querySelector('img').dataset.src;
     modalCaption.textContent = item.dataset.caption;
 
     // Update active thumbnail
@@ -92,9 +94,32 @@ document.addEventListener('DOMContentLoaded', () => {
     blue: Array.from(allPhotosSource).slice(0, 29),   // "White Dress" album (29 photos)
     white: Array.from(allPhotosSource).slice(29, 43), // "Pre-wedding" album (14 photos)
     brown: Array.from(allPhotosSource).slice(43, 91), // "Blue Dress" album (48 photos)
-    ilorin: Array.from(allPhotosSource).slice(91, 458), // "Ilorin, Kwara" album (324 photos)
-    ekoro: Array.from(allPhotosSource).slice(458, 527), // "Ekoro, Lagos" album (73 photos)
+    ilorin: Array.from(allPhotosSource).slice(91, 308), // "Ilorin, Kwara" album (324 photos)
+    ekoro: Array.from(allPhotosSource).slice(308, 377), // "Ekoro, Lagos" album (73 photos)
   };
+
+  // --- Lazy Loading Logic with Intersection Observer ---
+  let observer;
+
+  const lazyLoad = (target) => {
+    const io = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.dataset.src;
+
+          img.setAttribute('src', src);
+          img.classList.remove('lazy'); // Optional: remove class after loading
+
+          // Stop observing the image once it has been loaded
+          observer.unobserve(img);
+        }
+      });
+    });
+
+    io.observe(target);
+  };
+
 
   const openAlbum = (albumName) => {
     // Clear previous album photos and thumbnails
@@ -108,6 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Clone the node to avoid issues with re-appending
       const photo = photoNode.cloneNode(true);
       albumPhotosContainer.appendChild(photo);
+
+      // Set up lazy loading for the thumbnail in the grid
+      const lazyImage = photo.querySelector('img.lazy');
+      if (lazyImage) lazyLoad(lazyImage);
+
       galleryItems.push(photo);
 
       // Add click listener for the lightbox
@@ -121,7 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Create thumbnails for the lightbox
       const thumb = document.createElement('img');
-      thumb.src = photo.querySelector('img').src;
+      // Use the high-res source for thumbnails too, they are small anyway
+      thumb.src = photo.querySelector('img').dataset.src;
       thumb.className = 'thumbnail-img';
       thumb.addEventListener('click', () => showImage(index));
       thumbnailContainer.appendChild(thumb);
