@@ -71,9 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     currentIndex = index;
     const item = galleryItems[currentIndex];
-    modalImage.src = item.querySelector('img').src;
+    const img = item.querySelector('img');
+    
     // For the main modal image, we ensure it's the high-resolution one from data-src
-    modalImage.src = item.querySelector('img').dataset.src;
+    modalImage.src = img.dataset.src || img.src;
     modalCaption.textContent = item.dataset.caption;
 
     // Update active thumbnail
@@ -112,11 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const allPhotosSource = document.querySelectorAll('.photo-source .gallery-item');
 
   const albumContents = {
-    blue: Array.from(allPhotosSource).slice(0, 29),   // "White Dress" album (29 photos)
-    white: Array.from(allPhotosSource).slice(29, 43), // "Pre-wedding" album (14 photos)
-    brown: Array.from(allPhotosSource).slice(43, 91), // "Blue Dress" album (48 photos)
-    ilorin: Array.from(allPhotosSource).slice(91, 460), // "Ilorin, Kwara" album (324 photos)
-    ekoro: Array.from(allPhotosSource).slice(460, 527), // "Ekoro, Lagos" album (73 photos)
+    blue: Array.from(allPhotosSource).slice(0, 29),      // "White Dress" album (29 photos)
+    // white: Array.from(allPhotosSource).slice(29, 43), // "Pre-wedding" album (14 photos) - Commented out
+    brown: Array.from(allPhotosSource).slice(43, 91),    // "Blue Dress" album (48 photos)
+    ilorin: Array.from(allPhotosSource).slice(91, 460),  // "Ilorin, Kwara" album (369 photos)
+    // ekoro: Array.from(allPhotosSource).slice(460, 533), // "Ekoro, Lagos" album (73 photos) - Commented out
   };
 
   const openAlbum = (albumName) => {
@@ -149,8 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Create thumbnails for the lightbox
       const thumb = document.createElement('img');
+      const thumbImg = photo.querySelector('img');
       // Use the high-res source for thumbnails too, they are small anyway
-      thumb.src = photo.querySelector('img').dataset.src;
+      thumb.src = thumbImg.dataset.src || thumbImg.src;
       thumb.className = 'thumbnail-img';
       thumb.addEventListener('click', () => showImage(index));
       thumbnailContainer.appendChild(thumb);
